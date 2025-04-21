@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>記帳本!!!!!!!!!!!!!</title>
+    <title>記帳本</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,33 +27,44 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>簡單記帳本(・∀・)つ⑩</h1>
+    <h1>簡單記帳本</h1>
 
-    <form id="recordForm">
-        <label for="date">日期：</label>
-        <input type="date" id="date" required>
-
-        <label for="category">類別：</label>
-        <select id="category">
+    <div class="container">
+      <!-- 左邊：新增記帳 -->
+      <div class="left">
+        <form id="recordForm">
+          <label for="date">日期：</label>
+          <input type="date" id="date" required>
+    
+          <label for="category">類別：</label>
+          <select id="category">
             <option value="飲食">飲食</option>
             <option value="交通">交通</option>
-            <option value="飲食">生活用品</option>
             <option value="娛樂">娛樂</option>
             <option value="其他">其他</option>
-        </select>
+          </select>
+    
+          <label for="amount">金額：</label>
+          <input type="number" id="amount" required>
+    
+          <label for="note">備註：</label>
+          <input type="text" id="note">
+    
+          <button type="submit">新增記帳</button>
 
-        <label for="amount">金額：</label>
-        <input type="number" id="amount" required>
+          <label for="monthFilter"><strong>選擇月份：</strong></label>
+         <input type="month" id="monthFilter">
+         <p id="monthlyTotal"><strong>該月總支出：</strong> 0 元</p>
 
-        <label for="note">備註：</label>
-        <input type="text" id="note">
-
-        <button type="submit">新增記帳</button>
-    </form>
-
-    <h2>記帳紀錄</h2>
-    <div id="records"></div>
-
-    <script src="script.js"></script>
+        </form>
+      </div>
+    
+      <!-- 右邊：紀錄區 -->
+      <div class="right">
+        <h2>記帳紀錄</h2>
+        <div id="records"></div>
+      </div>
+    </div>
+    
 </body>
 </html>

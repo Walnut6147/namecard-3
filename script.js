@@ -1,19 +1,27 @@
-//https://script.google.com/macros/s/AKfycbzWF2iYrp7gQxxDeQmmTRxDfLClRGIL5twTiFsMEYbfYhSBZu-cTMOsPA4at8qyX3GoIw/exec
-const apiUrl = "hhttps://script.google.com/macros/s/AKfycbwCN9JRapG--AdWZTG8f6opKLbJ-3j30_mVEPYyxGwMMmwd-y9kcb-REzcQENRriRg0fw/execttps://script.google.com/macros/s/AKfycbzWF2iYrp7gQxxDeQmmTRxDfLClRGIL5twTiFsMEYbfYhSBZu-cTMOsPA4at8qyX3GoIw/exec"; // 替換為你的 API 網址
+//https://script.google.com/macros/s/AKfycbxV7R1bCpxS2j-9UD_F8lx7z296aMMwlXboFmdmqYRvHTKszp-JMsgQSA0U_tAXMfejuQ/exec
+const apiUrl = "https://script.google.com/macros/s/AKfycbxV7R1bCpxS2j-9UD_F8lx7z296aMMwlXboFmdmqYRvHTKszp-JMsgQSA0U_tAXMfejuQ/exec"; // 替換為你的 API 網址
 
 const form = document.getElementById("recordForm");
 const recordsContainer = document.getElementById("records");
 
 // 讀取 Google Sheets 的記帳紀錄並顯示
-async function loadRecords() {
+async function loadRecords(selectedMonth = null) {
     try {
-        const response = await fetch(apiUrl); // `GET` 請求 API
-        const data = await response.json();   // 解析 JSON
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
-        recordsContainer.innerHTML = ""; // 清空舊資料
+        recordsContainer.innerHTML = "";
 
-        for (let i = 1; i < data.length; i++) { // 跳過標題列
+        let total = 0;
+
+        for (let i = 1; i < data.length; i++) {
             const [date, category, amount, note] = data[i];
+            const recordMonth = date.slice(0, 7); // 取得 YYYY-MM
+
+            // 如果有指定月份，才顯示該月資料
+            if (selectedMonth && selectedMonth !== recordMonth) continue;
+
+            total += Number(amount);
 
             const recordElement = document.createElement("div");
             recordElement.classList.add("record");
@@ -25,35 +33,49 @@ async function loadRecords() {
             `;
             recordsContainer.appendChild(recordElement);
         }
+
+        document.getElementById("monthlyTotal").textContent =
+            `該月總支出：${total} 元`;
     } catch (error) {
-        console.error("讀取紀錄時發生錯誤：", error);
+        console.error("載入紀錄失敗：", error);
     }
 }
+
 
 // 新增記帳資料
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
-
+  
     const date = document.getElementById("date").value;
     const category = document.getElementById("category").value;
     const amount = Number(document.getElementById("amount").value);
     const note = document.getElementById("note").value;
-
-    const newRecord = { date, category, amount, note };
-
+  
+    const newRecord = {
+      action: "add", // 告訴 Apps Script：這是新增行為
+      date,
+      category,
+      amount,
+      note
+    };
+  
     await fetch(apiUrl, {
-        method: "POST",
-        body: JSON.stringify(newRecord),
-        headers: { "Content-Type": "application/json" },
-        mode: "no-cors"  // 避免 CORS 錯誤
+      method: "POST",
+      body: JSON.stringify(newRecord),
+      headers: { "Content-Type": "application/json" }
     });
-
+  
     form.reset();
-    alert("記帳成功！（請到 Google Sheets 查看資料）");
-
-    // **重新載入紀錄，確保新資料即時顯示**
-    setTimeout(loadRecords, 2000); // 等 2 秒後重新載入資料
+    alert("記帳成功！");
+    setTimeout(loadRecords, 2000);
+  });
+  const monthFilter = document.getElementById("monthFilter");
+monthFilter.addEventListener("change", () => {
+    const selectedMonth = monthFilter.value; // 格式為 YYYY-MM
+    loadRecords(selectedMonth);
 });
+
+  
 
 // **網頁載入時自動載入記帳紀錄**
 window.addEventListener("load", loadRecords);
